@@ -13,7 +13,7 @@ enum class State {CALCULATING, DISPLAYING};
 class ComplexPlane : public sf::Drawable {
 	public:
 		ComplexPlane(int pixelWidth, int pixelHeight);
-		void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+		void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 		void zoomIn();
 		void zoomOut();
 		void setCenter(sf::Vector2i mousePixel);
