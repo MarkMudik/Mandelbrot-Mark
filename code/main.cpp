@@ -7,14 +7,14 @@ using namespace std;
 
 int main() {
 	
-	int pixelWidth = VideoMode::getDesktopMode().width;
-	int pixelHeight = VideoMode::getDesktopMode().height;
-	VideoMode vm(pixelWidth, pixelHeight);
+	sf::VideoMode vm = sf::VideoMode::getDesktopMode();
+	sf::Vector2u screen = sf::VideoMode::getDesktopMode().size;
 	RenderWindow window(vm, "Mandelbrot Set", Style::Default);
-	
 	Font font("AdwaitaSans-Regular.ttf");
 	Text text(font);
+	text.setCharacterSize(24);
 	
+	ComplexPlane mandel(screen.x, screen.y);
 	while (window.isOpen()) {
 		///Input
 		while (const optional event = window.pollEvent()) {
@@ -25,15 +25,17 @@ int main() {
 			
 			if (const auto* mb = event->getIf<Event::MouseButtonPressed>()) {
 				if (mb->button == Mouse::Button::Left) {
-					//TODO
+					mandel.zoomIn();
+					mandel.setCenter(sf::Mouse::getPosition(window));
 				}
 				else if (mb->button == Mouse::Button::Right) {
-					//TODO
+					mandel.zoomOut();
+					mandel.setCenter(sf::Mouse::getPosition(window));
 				}
 			}
 
-			if (const auto* mouseMoved = event->getIf<Event::MouseButtonPressed>() {
-				//TODO
+			if (const auto* mouseMoved = event->getIf<Event::MouseButtonPressed>()) {
+				mandel.setMouseLocation(sf::Mouse::getPosition(window));
 			}
 		}
 
@@ -45,8 +47,17 @@ int main() {
 
 		
 		///Draw
-		window.clear();
 		//window.draw(...);
+
+		mandel.updateRenderer();
+		mandel.loadText(text);
+
+		window.clear();
+
+		mandel.draw(window, sf::RenderStates::Default);
+		window.draw(text);
+		
+		
 		window.display();
 	}
 }
