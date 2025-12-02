@@ -6,58 +6,66 @@ using namespace sf;
 using namespace std;
 
 int main() {
-	
-	sf::VideoMode vm = sf::VideoMode::getDesktopMode();
-	sf::Vector2u screen = sf::VideoMode::getDesktopMode().size;
-	RenderWindow window(vm, "Mandelbrot Set", Style::Default);
-	Font font("AdwaitaSans-Regular.ttf");
-	Text text(font);
-	text.setCharacterSize(24);
-	
-	ComplexPlane mandel(screen.x, screen.y);
-	while (window.isOpen()) {
-		///Input
-		while (const optional event = window.pollEvent()) {
-			
-			if (event->is<Event::Closed>()) {
-				window.close();
-			}
-			
-			if (const auto* mb = event->getIf<Event::MouseButtonPressed>()) {
-				if (mb->button == Mouse::Button::Left) {
-					mandel.zoomIn();
-					mandel.setCenter(sf::Mouse::getPosition(window));
-				}
-				else if (mb->button == Mouse::Button::Right) {
-					mandel.zoomOut();
-					mandel.setCenter(sf::Mouse::getPosition(window));
-				}
-			}
+    
+    VideoMode vm = VideoMode::getDesktopMode();
+    unsigned int width = vm.width;
+    unsigned int height = vm.height;
+    
+    RenderWindow window(vm, "Mandelbrot Set", Style::Default);
+    
+    Font font;
+    if (!font.loadFromFile("AdwaitaSans-Regular.ttf")) {
+        // For error
+        cerr << "Failed to load font!" << endl;
+    }
+    
+    Text text;
+    text.setFont(font);
+    text.setCharacterSize(24);
+    text.setFillColor(Color::White);
+    
+    ComplexPlane mandel(width, height);
 
-			if (const auto* mouseMoved = event->getIf<Event::MouseMoved>()) {
-				mandel.setMouseLocation(sf::Mouse::getPosition(window));
-			}
-		}
+    while (window.isOpen()) {
+        ///Input
+        Event event;
+        while (window.pollEvent(event)) {
+            
+            if (event.type == Event::Closed) {
+                window.close();
+            }
+            
+            if (event.type == Event::MouseButtonPressed) {
+                if (event.mouseButton.button == Mouse::Left) {
+                    mandel.zoomIn();
+                    mandel.setCenter(Mouse::getPosition(window));
+                }
+                else if (event.mouseButton.button == Mouse::Right) {
+                    mandel.zoomOut();
+                    mandel.setCenter(Mouse::getPosition(window));
+                }
+            }
 
-		if (Keyboard::isKeyPressed(Keyboard::Scan::Escape)) {
-			window.close();
-		}
-		
-		///Update
+            if (event.type == Event::MouseMoved) {
+                mandel.setMouseLocation(Mouse::getPosition(window));
+            }
+        }
 
-		
-		///Draw
-		//window.draw(...);
+        if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+            window.close();
+        }
+        
+        ///Update
+        mandel.updateRenderer();
+        mandel.loadText(text);
 
-		mandel.updateRenderer();
-		mandel.loadText(text);
+        ///Draw
+        window.clear();
 
-		window.clear();
-
-		mandel.draw(window, sf::RenderStates::Default);
-		window.draw(text);
-		
-		
-		window.display();
-	}
+        mandel.draw(window, RenderStates::Default);
+        window.draw(text);
+        
+        window.display();
+    }
+    return 0;
 }
