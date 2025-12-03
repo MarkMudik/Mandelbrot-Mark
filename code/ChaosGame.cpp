@@ -136,7 +136,7 @@ void ChaosGame::loadText(sf::Text& text) {
     txt << "Polygon: " << m_sides << " sides\n";
     txt << "Ratio (r): " << m_ratio << "\n";
     txt << "Total Points Drawn: " << m_pointsDrawn << "\n";
-    txt << "Press 3, 4, 5, 6, 7, 8, 9, 0 (for 10) to change polygon\n";
+    txt << "Press number 3-9 or 0 (for 10) to change polygon\n";
     txt << "Rule: No repeating vertex for sides >= 4";
 
     text.setString(txt.str());
