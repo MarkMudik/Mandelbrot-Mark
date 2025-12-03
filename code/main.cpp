@@ -1,4 +1,4 @@
-#include "ComplexPlane.h"
+#include "ChaosGame.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
@@ -11,12 +11,11 @@ int main() {
     unsigned int width = vm.width;
     unsigned int height = vm.height;
     
-    RenderWindow window(vm, "Mandelbrot Set", Style::Default);
+    RenderWindow window(vm, "Chaos Game Fractal Generator", Style::Default);
     
     Font font;
     if (!font.loadFromFile("AdwaitaSans-Regular.ttf")) {
-        // For error
-        cerr << "Failed to load font!" << endl;
+        cerr << "Failed to load font! Make sure AdwaitaSans-Regular.ttf is in the directory." << endl;
     }
     
     Text text;
@@ -24,10 +23,11 @@ int main() {
     text.setCharacterSize(24);
     text.setFillColor(Color::White);
     
-    ComplexPlane mandel(width, height);
+    ChaosGame chaos(width, height); 
+    int currentSides = 3;
+    chaos.setPolygon(currentSides);
 
     while (window.isOpen()) {
-        ///Input
         Event event;
         while (window.pollEvent(event)) {
             
@@ -35,27 +35,27 @@ int main() {
                 window.close();
             }
             
-            if (event.type == Event::MouseButtonPressed) {
-                if (event.mouseButton.button == Mouse::Left) {
-                    mandel.zoomIn();
-                    mandel.setCenter(Mouse::getPosition(window));
-                }
-                else if (event.mouseButton.button == Mouse::Right) {
-                    mandel.zoomOut();
-                    mandel.setCenter(Mouse::getPosition(window));
-                }
-            }
-
-            if (event.type == Event::MouseMoved) {
-                mandel.setMouseLocation(Mouse::getPosition(window));
-            }
-
             if (event.type == Event::KeyPressed) {
+                int newSides = currentSides;
+                if (event.key.code == Keyboard::Num3) newSides = 3;
+                else if (event.key.code == Keyboard::Num4) newSides = 4;
+                else if (event.key.code == Keyboard::Num5) newSides = 5;
+                else if (event.key.code == Keyboard::Num6) newSides = 6;
+                else if (event.key.code == Keyboard::Num7) newSides = 7;
+                else if (event.key.code == Keyboard::Num8) newSides = 8;
+                else if (event.key.code == Keyboard::Num9) newSides = 9;
+                else if (event.key.code == Keyboard::Num0) newSides = 10;
+                
+                if (newSides != currentSides) {
+                    currentSides = newSides;
+                    chaos.setPolygon(currentSides); 
+                }
+
                 if (event.key.code == Keyboard::S) {
                     Texture texture;
                     texture.create(window.getSize().x, window.getSize().y);
                     texture.update(window);
-                    if (texture.copyToImage().saveToFile("mandelbrot_snap.png")) {
+                    if (texture.copyToImage().saveToFile("chaos_game_snap.png")) {
                         cout << "Screenshot saved!" << endl;
                     }
                 }
@@ -67,13 +67,13 @@ int main() {
         }
         
         ///Update
-        mandel.updateRenderer();
-        mandel.loadText(text);
+        chaos.updateRenderer();
+        chaos.loadText(text);
 
         ///Draw
-        window.clear();
+        window.clear(); 
 
-        mandel.draw(window, RenderStates::Default);
+        chaos.draw(window, RenderStates::Default);
         window.draw(text);
         
         window.display();
